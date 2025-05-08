@@ -1,0 +1,28 @@
+No files changed, compilation skipped
+
+Ran 14 tests for test/NFTMarket.t.sol:NFTMarketTest
+[PASS] invariant_MarketHasNoTokens() (runs: 256, calls: 128000, reverts: 109729)
+Logs:
+  address 0x00000000000000000000000000000000000003e8
+  address(market) 0x522B3294E6d06aA25Ad0f1B8891242E335D3B459
+  address 0x00000000000000000000000000000000000003e9
+  address(market) 0x522B3294E6d06aA25Ad0f1B8891242E335D3B459
+  address 0x00000000000000000000000000000000000003EA
+  address(market) 0x522B3294E6d06aA25Ad0f1B8891242E335D3B459
+
+[PASS] testBuyNFTFailAlreadySold() (gas: 257305)
+[PASS] testBuyNFTFailBuyOwnNFT() (gas: 150863)
+[PASS] testBuyNFTFailInsufficientAllowance() (gas: 186330)
+[PASS] testBuyNFTFailInsufficientBalance() (gas: 219642)
+[PASS] testBuyNFTFailNotListed() (gas: 25685)
+[PASS] testBuyNFTSuccess() (gas: 212884)
+[PASS] testCancelListing() (gas: 140522)
+[PASS] testCancelListingFailNotSeller() (gas: 153900)
+[PASS] testFuzz_ListAndBuyNFT(uint256,address) (runs: 256, μ: 234601, ~: 234684)
+[PASS] testListNFTFailNotApproved() (gas: 36127)
+[PASS] testListNFTFailNotOwner() (gas: 27986)
+[PASS] testListNFTFailZeroPrice() (gas: 50794)
+[PASS] testListNFTSuccess() (gas: 158976)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 10.05s (10.09s CPU time)
+
+Ran 1 test suite in 10.05s (10.05s CPU time): 14 tests passed, 0 failed, 0 skipped (14 total tests)

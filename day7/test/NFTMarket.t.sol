@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 import "../src/NFTMarket.sol";
+import "forge-std/console.sol";
 
 contract NFTMarketTest is Test {
     // 合约实例
@@ -11,9 +12,9 @@ contract NFTMarketTest is Test {
     MyNFT public nft;
 
     // 测试账户
-    address public owner = address(1);
-    address public seller = address(2);
-    address public buyer = address(3);
+    address public owner = address(uint160(1));
+    address public seller = address(uint160(2));
+    address public buyer = address(uint160(3));
 
     // 测试数据
     uint256 public initialSupply = 1000000;
@@ -37,7 +38,7 @@ contract NFTMarketTest is Test {
 
         // 给买家转一些代币
         vm.startPrank(owner);
-        token.transfer(buyer, 10000);
+        token.transfer(buyer, 1000000);
         vm.stopPrank();
     }
 
@@ -304,36 +305,19 @@ contract NFTMarketTest is Test {
     }
     
 
-    // 设置不变性测试环境
-    function setUpInvariant() public {
-            // 使用不同的账户部署合约
-        vm.startPrank(owner);
-        market = new NFTMarket();
-        token = new MyERC20("Test Token", "TEST", initialSupply);
-        nft = new MyNFT("Test NFT", "TNFT");
-        vm.stopPrank();
-
-        // 铸造NFT给卖家
-        vm.startPrank(owner);
-        tokenId = nft.mint(seller, NFT_URI);
-        vm.stopPrank();
-
-        // 给买家转一些代币
-        vm.startPrank(owner);
-        token.transfer(buyer, 10000);
-        vm.stopPrank();
-    }
-
     // 不变性测试 - 确保NFTMarket合约不会持有任何代币
     function invariant_MarketHasNoTokens() public {
         // 创建多个NFT和代币进行测试
-        address[] memory testUsers = new address[](5);
-        for(uint i = 0; i < 5; i++) {
+        address[] memory testUsers = new address[](3);
+        address[] memory testBuyUsers = new address[](3);
+        for(uint i = 0; i < 3; i++) {
             testUsers[i] = address(uint160(1000 + i));
-            
+            testBuyUsers[i] = address(uint160(10000 + i));
+            console.log("address",address(testUsers[i]));
             // 给测试用户转代币
             vm.startPrank(owner);
-            token.transfer(testUsers[i], 1000);
+            // token.transfer(testUsers[i], 1000);
+            token.transfer(testBuyUsers[i], 1000);
             vm.stopPrank();
             
             // 铸造NFT给测试用户
@@ -341,15 +325,15 @@ contract NFTMarketTest is Test {
             uint256 newTokenId = nft.mint(testUsers[i], string(abi.encodePacked(NFT_URI, "-", i)));
             vm.stopPrank();
             
-            // 上架NFT
+            // // 上架NFT
             vm.startPrank(testUsers[i]);
             nft.approve(address(market), newTokenId);
             market.listNFT(address(nft), newTokenId, address(token), 100 + i);
             vm.stopPrank();
-            
-            // 另一个用户购买NFT
-            uint buyerIndex = (i + 1) % 5;
-            vm.startPrank(testUsers[buyerIndex]);
+            console.log("address(market)",address(market));
+            // // 另一个用户购买NFT
+            // uint buyerIndex = (i + 1) % 3;
+            vm.startPrank(testBuyUsers[i]);
             token.approve(address(market), 100 + i);
             market.buyNFT(address(nft), newTokenId);
             vm.stopPrank();
