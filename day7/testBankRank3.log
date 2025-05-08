@@ -1,0 +1,202 @@
+No files changed, compilation skipped
+
+Ran 8 tests for test/BankRank3.t.sol:BankRank3Test
+[PASS] testAdminWithdraw() (gas: 120166)
+Traces:
+  [120166] BankRank3Test::testAdminWithdraw()
+    ├─ [0] VM::prank(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF])
+    │   └─ ← [Return]
+    ├─ [90248] Bank::receive{value: 1000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(BankRank3Test: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496])
+    │   └─ ← [Return]
+    ├─ [7360] Bank::withdraw()
+    │   ├─ [55] BankRank3Test::receive{value: 1000000000000000000}()
+    │   │   └─ ← [Stop]
+    │   └─ ← [Stop]
+    ├─ [0] VM::assertEq(0, 0) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(79228162515264337593543950335 [7.922e28], 79228162515264337593543950335 [7.922e28]) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testDeposit() (gas: 112328)
+Traces:
+  [112328] BankRank3Test::testDeposit()
+    ├─ [2801] Bank::balances(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF]) [staticcall]
+    │   └─ ← [Return] 0
+    ├─ [0] VM::assertEq(0, 0) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::prank(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF])
+    │   └─ ← [Return]
+    ├─ [88248] Bank::receive{value: 1000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [801] Bank::balances(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF]) [staticcall]
+    │   └─ ← [Return] 1000000000000000000 [1e18]
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18]) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testNonAdminCannotWithdraw() (gas: 110569)
+Traces:
+  [110569] BankRank3Test::testNonAdminCannotWithdraw()
+    ├─ [0] VM::prank(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF])
+    │   └─ ← [Return]
+    ├─ [90248] Bank::receive{value: 1000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  Unauthorized)
+    │   └─ ← [Return]
+    ├─ [483] Bank::withdraw()
+    │   └─ ← [Revert] Unauthorized
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18]) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testTopThreeWithFourUsers() (gas: 330299)
+Traces:
+  [370099] BankRank3Test::testTopThreeWithFourUsers()
+    ├─ [0] VM::prank(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF])
+    │   └─ ← [Return]
+    ├─ [90248] Bank::receive{value: 1000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802])
+    │   └─ ← [Return]
+    ├─ [71970] Bank::receive{value: 2000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(user3: [0xc0A55e2205B289a967823662B841Bd67Aa362Aec])
+    │   └─ ← [Return]
+    ├─ [76264] Bank::receive{value: 3000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(user4: [0x90561e5Cd8025FA6F52d849e8867C14A77C94BA0])
+    │   └─ ← [Return]
+    ├─ [71526] Bank::receive{value: 2500000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [4936] Bank::getTopThree() [staticcall]
+    │   └─ ← [Return] [Rank({ addr: 0xc0A55e2205B289a967823662B841Bd67Aa362Aec, amount: 3000000000000000000 [3e18] }), Rank({ addr: 0x90561e5Cd8025FA6F52d849e8867C14A77C94BA0, amount: 2500000000000000000 [2.5e18] }), Rank({ addr: 0x537C8f3d3E18dF5517a58B3fB9D9143697996802, amount: 2000000000000000000 [2e18] })]
+    ├─ [0] VM::assertEq(user3: [0xc0A55e2205B289a967823662B841Bd67Aa362Aec], user3: [0xc0A55e2205B289a967823662B841Bd67Aa362Aec]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(3000000000000000000 [3e18], 3000000000000000000 [3e18]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(user4: [0x90561e5Cd8025FA6F52d849e8867C14A77C94BA0], user4: [0x90561e5Cd8025FA6F52d849e8867C14A77C94BA0]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(2500000000000000000 [2.5e18], 2500000000000000000 [2.5e18]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802], user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(2000000000000000000 [2e18], 2000000000000000000 [2e18]) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testTopThreeWithMultipleDeposits() (gas: 214051)
+Traces:
+  [214051] BankRank3Test::testTopThreeWithMultipleDeposits()
+    ├─ [0] VM::prank(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF])
+    │   └─ ← [Return]
+    ├─ [90248] Bank::receive{value: 1000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802])
+    │   └─ ← [Return]
+    ├─ [71970] Bank::receive{value: 2000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF])
+    │   └─ ← [Return]
+    ├─ [5775] Bank::receive{value: 2000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [4416] Bank::getTopThree() [staticcall]
+    │   └─ ← [Return] [Rank({ addr: 0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF, amount: 3000000000000000000 [3e18] }), Rank({ addr: 0x537C8f3d3E18dF5517a58B3fB9D9143697996802, amount: 2000000000000000000 [2e18] }), Rank({ addr: 0x0000000000000000000000000000000000000000, amount: 0 })]
+    ├─ [0] VM::assertEq(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF], user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(3000000000000000000 [3e18], 3000000000000000000 [3e18]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802], user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(2000000000000000000 [2e18], 2000000000000000000 [2e18]) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testTopThreeWithOneUser() (gas: 119046)
+Traces:
+  [119046] BankRank3Test::testTopThreeWithOneUser()
+    ├─ [0] VM::prank(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF])
+    │   └─ ← [Return]
+    ├─ [90248] Bank::receive{value: 1000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [3797] Bank::getTopThree() [staticcall]
+    │   └─ ← [Return] [Rank({ addr: 0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF, amount: 1000000000000000000 [1e18] }), Rank({ addr: 0x0000000000000000000000000000000000000000, amount: 0 }), Rank({ addr: 0x0000000000000000000000000000000000000000, amount: 0 })]
+    ├─ [0] VM::assertEq(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF], user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(0x0000000000000000000000000000000000000000, 0x0000000000000000000000000000000000000000) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(0, 0) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(0x0000000000000000000000000000000000000000, 0x0000000000000000000000000000000000000000) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(0, 0) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testTopThreeWithThreeUsers() (gas: 288597)
+Traces:
+  [288597] BankRank3Test::testTopThreeWithThreeUsers()
+    ├─ [0] VM::prank(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF])
+    │   └─ ← [Return]
+    ├─ [90248] Bank::receive{value: 1000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802])
+    │   └─ ← [Return]
+    ├─ [71970] Bank::receive{value: 2000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(user3: [0xc0A55e2205B289a967823662B841Bd67Aa362Aec])
+    │   └─ ← [Return]
+    ├─ [76264] Bank::receive{value: 3000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [4936] Bank::getTopThree() [staticcall]
+    │   └─ ← [Return] [Rank({ addr: 0xc0A55e2205B289a967823662B841Bd67Aa362Aec, amount: 3000000000000000000 [3e18] }), Rank({ addr: 0x537C8f3d3E18dF5517a58B3fB9D9143697996802, amount: 2000000000000000000 [2e18] }), Rank({ addr: 0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF, amount: 1000000000000000000 [1e18] })]
+    ├─ [0] VM::assertEq(user3: [0xc0A55e2205B289a967823662B841Bd67Aa362Aec], user3: [0xc0A55e2205B289a967823662B841Bd67Aa362Aec]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(3000000000000000000 [3e18], 3000000000000000000 [3e18]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802], user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(2000000000000000000 [2e18], 2000000000000000000 [2e18]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF], user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18]) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testTopThreeWithTwoUsers() (gas: 201724)
+Traces:
+  [201724] BankRank3Test::testTopThreeWithTwoUsers()
+    ├─ [0] VM::prank(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF])
+    │   └─ ← [Return]
+    ├─ [90248] Bank::receive{value: 1000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802])
+    │   └─ ← [Return]
+    ├─ [71970] Bank::receive{value: 2000000000000000000}()
+    │   └─ ← [Stop]
+    ├─ [4416] Bank::getTopThree() [staticcall]
+    │   └─ ← [Return] [Rank({ addr: 0x537C8f3d3E18dF5517a58B3fB9D9143697996802, amount: 2000000000000000000 [2e18] }), Rank({ addr: 0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF, amount: 1000000000000000000 [1e18] }), Rank({ addr: 0x0000000000000000000000000000000000000000, amount: 0 })]
+    ├─ [0] VM::assertEq(user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802], user2: [0x537C8f3d3E18dF5517a58B3fB9D9143697996802]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(2000000000000000000 [2e18], 2000000000000000000 [2e18]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF], user1: [0x29E3b139f4393aDda86303fcdAa35F60Bb7092bF]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(0x0000000000000000000000000000000000000000, 0x0000000000000000000000000000000000000000) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(0, 0) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 1.16ms (1.63ms CPU time)
+
+Ran 1 test suite in 4.98ms (1.16ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)
