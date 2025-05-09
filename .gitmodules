@@ -1,0 +1,6 @@
+[submodule "day8/TokenBankWithWeb/lib/forge-std"]
+	path = day8/TokenBankWithWeb/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "day8/TokenBankWithWeb/lib/openzeppelin-contracts"]
+	path = day8/TokenBankWithWeb/lib/openzeppelin-contracts
+	url = https://github.com/openzeppelin/openzeppelin-contracts
