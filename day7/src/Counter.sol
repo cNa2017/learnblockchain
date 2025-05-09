@@ -4,11 +4,21 @@ pragma solidity ^0.8.13;
 contract Counter {
     uint256 public number;
 
-    function setNumber(uint256 newNumber) public {
-        number = newNumber;
+    uint256 public val1;
+    uint256 public val2;
+    uint256 public val3;
+
+    function addToA(uint256 amount) external {
+        val1 += amount;
+        val3 += amount;
     }
 
-    function increment() public {
-        number++;
+    function addToB(uint256 amount) external {
+        val2 += amount;
+        val3 += amount;
+    }
+    function addToC(uint256 amount) external {
+        val2 += amount;
+        // val3 += amount;
     }
 }

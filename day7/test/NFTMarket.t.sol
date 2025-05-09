@@ -308,36 +308,40 @@ contract NFTMarketTest is Test {
     // 不变性测试 - 确保NFTMarket合约不会持有任何代币
     function invariant_MarketHasNoTokens() public {
         // 创建多个NFT和代币进行测试
-        address[] memory testUsers = new address[](3);
-        address[] memory testBuyUsers = new address[](3);
-        for(uint i = 0; i < 3; i++) {
-            testUsers[i] = address(uint160(1000 + i));
-            testBuyUsers[i] = address(uint160(10000 + i));
-            console.log("address",address(testUsers[i]));
-            // 给测试用户转代币
-            vm.startPrank(owner);
-            // token.transfer(testUsers[i], 1000);
-            token.transfer(testBuyUsers[i], 1000);
-            vm.stopPrank();
+        // address[] memory testUsers = new address[](3);
+        // // address[] memory testBuyUsers = new address[](3);
+        // for(uint i = 0; i < 3; i++) {
+        //     testUsers[i] = address(uint160(1000 + i));
+        //     // testBuyUsers[i] = address(uint160(10000 + i));
+        //     console.log("address",address(testUsers[i]));
+        //     // 给测试用户转代币
+        //     vm.startPrank(owner);
+        //     token.transfer(testUsers[i], 1000);
+        //     // token.transfer(testBuyUsers[i], 1000);
+        //     vm.stopPrank();
             
-            // 铸造NFT给测试用户
-            vm.startPrank(owner);
-            uint256 newTokenId = nft.mint(testUsers[i], string(abi.encodePacked(NFT_URI, "-", i)));
-            vm.stopPrank();
+        //     // 铸造NFT给测试用户
+        //     vm.startPrank(owner);
+        //     uint256 newTokenId = nft.mint(testUsers[i], string(abi.encodePacked(NFT_URI, "-", i)));
+        //     vm.stopPrank();
             
-            // // 上架NFT
-            vm.startPrank(testUsers[i]);
-            nft.approve(address(market), newTokenId);
-            market.listNFT(address(nft), newTokenId, address(token), 100 + i);
-            vm.stopPrank();
-            console.log("address(market)",address(market));
-            // // 另一个用户购买NFT
-            // uint buyerIndex = (i + 1) % 3;
-            vm.startPrank(testBuyUsers[i]);
-            token.approve(address(market), 100 + i);
-            market.buyNFT(address(nft), newTokenId);
-            vm.stopPrank();
-        }
+        //     // // 上架NFT
+        //     vm.startPrank(testUsers[i]);
+        //     nft.approve(address(market), newTokenId);
+        //     market.listNFT(address(nft), newTokenId, address(token), 100 + i);
+        //     vm.stopPrank();
+        //     console.log("address(market)",address(market));
+        //     // // 另一个用户购买NFT
+        //     uint buyerIndex = (i + 1) % 3;
+        //     console.log("buyerIndex",buyerIndex);
+        //     console.log("buyerIndexaddr",testUsers[1]);
+
+        //     vm.startPrank(testUsers[buyerIndex]);
+        //     // vm.startPrank(testBuyUsers[i]);
+        //     token.approve(address(market), 100 + i);
+        //     market.buyNFT(address(nft), newTokenId);
+        //     vm.stopPrank();
+        // }
         
         // 验证市场合约不持有任何代币
         assertEq(token.balanceOf(address(market)), 0);

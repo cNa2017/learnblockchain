@@ -5,20 +5,18 @@ import {Test, console} from "forge-std/Test.sol";
 import {Counter} from "../src/Counter.sol";
 
 contract CounterTest is Test {
-    Counter public counter;
 
-    function setUp() public {
-        counter = new Counter();
-        counter.setNumber(0);
+    Counter foo;
+
+    function setUp() external {
+        foo = new Counter();
     }
 
-    function test_Increment() public {
-        counter.increment();
-        assertEq(counter.number(), 1);
+    function invariant_A() external {
+        assertEq(foo.val1() + foo.val2(), foo.val3());
     }
 
-    function testFuzz_SetNumber(uint256 x) public {
-        counter.setNumber(x);
-        assertEq(counter.number(), x);
+    function invariant_B() external {
+        assertGe(foo.val1() + foo.val2(), foo.val3());
     }
 }
