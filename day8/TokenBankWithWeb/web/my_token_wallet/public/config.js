@@ -3,9 +3,9 @@ window.APP_CONFIG = {
   // 合约地址配置
   contracts: {
     // TokenBank合约地址 - 需要替换为实际部署的合约地址
-    tokenBank: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
+    tokenBank: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
     // ERC20代币合约地址 - 需要替换为实际部署的合约地址
-    erc20: '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+    erc20: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9'
   },
   // 网络配置
   network: {

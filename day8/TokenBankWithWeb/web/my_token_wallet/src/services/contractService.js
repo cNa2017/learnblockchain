@@ -1,4 +1,5 @@
 import { createPublicClient, createWalletClient, http, parseEther, formatEther } from 'viem';
+import { foundry } from 'viem/chains';
 // import { sepolia } from 'viem/chains';
 
 // 导入合约ABI
@@ -11,8 +12,8 @@ const ERC20_ADDRESS = window.APP_CONFIG.contracts.erc20;
 
 // 创建公共客户端
 const publicClient = createPublicClient({
-  chain: 31337, // 本地链无需指定 chain
-  transport: http('http://127.0.0.1:8545')
+  chain: foundry,
+  transport: http()
 });
 
 // 钱包客户端
@@ -33,25 +34,8 @@ export const connectWallet = async () => {
     // 创建钱包客户端
     walletClient = createWalletClient({
       account: currentAccount,
-      chain: {
-        id: 31337,
-        name: 'Localhost',
-        network: 'localhost',
-        nativeCurrency: {
-          decimals: 18,
-          name: 'Ether',
-          symbol: 'ETH'
-        },
-        rpcUrls: {
-          default: {
-            http: ['http://127.0.0.1:8545']
-          },
-          public: {
-            http: ['http://127.0.0.1:8545']
-          }
-        }
-      },
-      transport: http('http://127.0.0.1:8545')
+      chain: foundry,
+      transport: http()
     });
     
     return { success: true, account: currentAccount };
