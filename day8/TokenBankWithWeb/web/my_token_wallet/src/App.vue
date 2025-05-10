@@ -20,6 +20,10 @@
           :walletConnected="walletConnected"
           @transaction-completed="refreshBalances"
         />
+        
+        <div class="nft-log-section">
+          <NFTEventLog />
+        </div>
       </div>
       
       <div v-else class="connect-prompt">
@@ -33,13 +37,15 @@
 import WalletConnect from './components/WalletConnect.vue';
 import BalanceDisplay from './components/BalanceDisplay.vue';
 import TokenOperations from './components/TokenOperations.vue';
+import NFTEventLog from './components/NFTEventLog.vue';
 
 export default {
   name: 'App',
   components: {
     WalletConnect,
     BalanceDisplay,
-    TokenOperations
+    TokenOperations,
+    NFTEventLog
   },
   data() {
     return {
@@ -67,46 +73,48 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 30px;
+  margin-top: 60px;
 }
 
 .container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0 20px;
 }
 
 .app-title {
-  font-size: 28px;
+  text-align: center;
+  color: #3498db;
   margin-bottom: 10px;
-  color: #0275d8;
 }
 
 .app-description {
-  font-size: 16px;
-  color: #6c757d;
+  text-align: center;
+  color: #7f8c8d;
   margin-bottom: 30px;
 }
 
 .wallet-content {
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 .connect-prompt {
-  margin-top: 30px;
+  text-align: center;
+  margin-top: 50px;
   padding: 20px;
   background-color: #f8f9fa;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #7f8c8d;
 }
 
-.connect-prompt p {
-  font-size: 18px;
-  color: #6c757d;
+.nft-log-section {
+  margin-top: 40px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 20px;
 }
 </style>

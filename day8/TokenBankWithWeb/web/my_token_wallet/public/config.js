@@ -5,7 +5,9 @@ window.APP_CONFIG = {
     // TokenBank合约地址 - 需要替换为实际部署的合约地址
     tokenBank: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
     // ERC20代币合约地址 - 需要替换为实际部署的合约地址
-    erc20: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9'
+    erc20: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
+    // NFTMarket合约地址 - 需要替换为实际部署的合约地址
+    nftMarket: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0'
   },
   // 网络配置
   network: {
