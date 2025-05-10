@@ -13,9 +13,11 @@ contract TokenBankDeploy is Script {
         // 部署MyToken合约并铸造初始代币
         uint256 initialSupply = 1000000 * 10**18; // 100万代币
         MyToken token = new MyToken(initialSupply);
+        console.log("MyToken address: %s", address(token));
         
         // 部署TokenBank合约并传入MyToken地址
         TokenBank bank = new TokenBank(address(token));
+        console.log("TokenBank address: %s", address(bank));
         
         vm.stopBroadcast();
     }
