@@ -158,7 +158,7 @@ export default {
         this.loading = true;
         this.operationType = 'deposit';
         this.transactionStatus = { message: '存款交易处理中...', success: false };
-        
+        console.log('Deposit Amount:', this.depositAmount);
         const result = await depositToBank(this.depositAmount.toString());
         
         if (result.success) {

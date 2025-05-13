@@ -1,5 +1,5 @@
 import { createPublicClient, createWalletClient, http, parseEther, formatEther } from 'viem';
-import { foundry } from 'viem/chains';
+import { sepolia } from 'viem/chains';
 // import { sepolia } from 'viem/chains';
 
 // 导入合约ABI
@@ -12,7 +12,7 @@ const ERC20_ADDRESS = window.APP_CONFIG.contracts.erc20;
 
 // 创建公共客户端
 const publicClient = createPublicClient({
-  chain: foundry,
+  chain: sepolia,
   transport: http()
 });
 
@@ -34,7 +34,7 @@ export const connectWallet = async () => {
     // 创建钱包客户端
     walletClient = createWalletClient({
       account: currentAccount,
-      chain: foundry,
+      chain: sepolia,
       transport: http()
     });
     
@@ -99,14 +99,16 @@ export const depositToBank = async (amount) => {
     if (!walletClient) {
       throw new Error('钱包未连接');
     }
-    
-    // 首先需要批准TokenBank合约使用代币
-    const approveHash = await walletClient.writeContract({
-      address: ERC20_ADDRESS,
-      abi: ERC20ABI,
-      functionName: 'approve',
-      args: [TOKEN_BANK_ADDRESS, parseEther(amount)]
-    });
+      console.log('-----walletClient1', walletClient); //
+      // 首先需要批准TokenBank合约使用代币
+      const approveHash = await walletClient.writeContract({
+        account:currentAccount,
+        address: ERC20_ADDRESS,
+        abi: ERC20ABI,
+        functionName: 'approve',
+        args: [TOKEN_BANK_ADDRESS, parseEther(amount)]
+      });
+      console.log('-----walletClient2', walletClient); //
     
     // 等待批准交易确认
     await publicClient.waitForTransactionReceipt({ hash: approveHash });

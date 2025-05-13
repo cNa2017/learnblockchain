@@ -1,5 +1,5 @@
 import { createPublicClient, http } from 'viem';
-import { foundry } from 'viem/chains';
+import { sepolia } from 'viem/chains';
 
 // 导入合约ABI
 import NFTMarketABI from "../../public/contracts/NFTMarket.json";
@@ -9,8 +9,8 @@ const NFT_MARKET_ADDRESS = window.APP_CONFIG.contracts.nftMarket;
 
 // 创建公共客户端
 const publicClient = createPublicClient({
-  chain: foundry,
-  transport: http()
+  chain: sepolia,
+  transport: http("https://sepolia.infura.io/v3/ffcda30520a845238726f8ef17ce38d2")
 });
 
 // 存储事件日志
