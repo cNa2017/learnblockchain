@@ -1,0 +1,264 @@
+No files changed, compilation skipped
+
+Ran 17 tests for test/Inscription/Inscription.t.sol:InscriptionTest
+[PASS] test_BuyMemeFailsWhenPriceNotBetter() (gas: 1907974)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Is Uniswap price better? false
+  Mint price per token: 10000000000000000
+  buyMeme correctly failed when mint price is better
+
+[PASS] test_BuyMemeWithAdvantageousPrice() (gas: 1995083)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Testing with ETH amount: 1000000000000000
+    Expected tokens from Uniswap: 0
+    Is Uniswap price better? false
+    Mint price per token: 10000000000000000
+    No tokens available from Uniswap
+  Testing with ETH amount: 10000000000000000
+    Expected tokens from Uniswap: 0
+    Is Uniswap price better? false
+    Mint price per token: 10000000000000000
+    No tokens available from Uniswap
+  Testing with ETH amount: 100000000000000000
+    Expected tokens from Uniswap: 8
+    Is Uniswap price better? false
+    Mint price per token: 10000000000000000
+    Uniswap price per token: 12500000000000000000000000000000000
+    Uniswap price not better for this amount
+  Testing with ETH amount: 1000000000000000000
+    Expected tokens from Uniswap: 33
+    Is Uniswap price better? false
+    Mint price per token: 10000000000000000
+    Uniswap price per token: 30303030303030303030303030303030303
+    Uniswap price not better for this amount
+  Testing with ETH amount: 5000000000000000000
+    Expected tokens from Uniswap: 45
+    Is Uniswap price better? false
+    Mint price per token: 10000000000000000
+    Uniswap price per token: 111111111111111111111111111111111111
+    Uniswap price not better for this amount
+  No advantageous price found - this demonstrates price protection works
+  Advantageous price test completed
+
+[PASS] test_BuyMemeWithBetterUniswapPrice() (gas: 1919230)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Is Uniswap price better than mint price? false
+  Mint price per token: 10000000000000000
+  Tokens from Uniswap with 1 ETH: 33
+  Uniswap price per token: 30303030303030303030303030303030303
+  Mint price per token: 10000000000000000
+  Uniswap price is not better, testing should fail...
+  buyMeme correctly failed when price not better
+
+[PASS] test_BuyMemeWithLiquidityPool() (gas: 1918872)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Expected tokens from Uniswap: 8
+  Mint price per token: 10000000000000000
+  Is Uniswap price better? false
+  buyMeme correctly failed when price not better
+
+[PASS] test_BuyMemeWithoutPair() (gas: 237986)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  buyMeme test passed (no trading pair exists)
+
+[PASS] test_ConstructorParameters() (gas: 15363)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Constructor parameters test passed
+
+[PASS] test_DeployInscription() (gas: 237265)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Token deployed at: 0x03701a3db17248c79AA6512CcDC89c45bc1443E2
+  Mint cost: 1000000000000000000
+
+[PASS] test_DeploymentWithZeroValues() (gas: 20658)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Zero values deployment tests passed
+
+[PASS] test_FailMintInscriptionExceedsMaxSupply() (gas: 357009)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Token deployed at: 0x03701a3db17248c79AA6512CcDC89c45bc1443E2
+  Max supply: 1000
+  First mint attempt
+  Second mint attempt (should fail)
+
+[PASS] test_FailMintInscriptionInsufficientPayment() (gas: 235170)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Token deployed at: 0x03701a3db17248c79AA6512CcDC89c45bc1443E2
+  Required payment: 1000000000000000000
+  Attempting to mint with insufficient payment: 999999999999999999
+
+[PASS] test_GetUniswapPriceNoPair() (gas: 226930)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Uniswap price test passed (no trading pair)
+
+[PASS] test_IsUniswapPriceBetterNoPair() (gas: 229122)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Uniswap price comparison test passed (no trading pair)
+
+[PASS] test_LiquidityAdditionWithEnoughFees() (gas: 1862416)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Total payment per mint: 1000000000000000000
+  Platform fee per mint: 50000000000000000
+  Mints needed for liquidity: 2
+  Mint 1 completed. Accumulated fee: 50000000000000000
+  Mint 2 completed. Accumulated fee: 0
+  Liquidity pool created: true
+  Liquidity pool was automatically created
+
+[PASS] test_ManualLiquidityAddition() (gas: 350011)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Accumulated platform fee: 50000000000000000
+  Manual liquidity addition test passed
+
+[PASS] test_MintInscription() (gas: 359029)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Token deployed at: 0x03701a3db17248c79AA6512CcDC89c45bc1443E2
+  Attempting to mint tokens
+  Required payment: 1000000000000000000
+  User2 balance: 100000000000000000000
+  Platform fee (5%): 50000000000000000
+  Creator fee (95%): 950000000000000000
+
+[PASS] test_MultipleMints() (gas: 1947004)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Token deployed at: 0x03701a3db17248c79AA6512CcDC89c45bc1443E2
+  Max supply: 5000
+  Mint attempt: 1
+  Total minted after mint 1 : 1000
+  Mint attempt: 2
+  Total minted after mint 2 : 2100
+  Mint attempt: 3
+  Total minted after mint 3 : 3100
+  Final accumulated platform fee: 50000000000000000
+  Liquidity pool created: true
+  All mints completed successfully
+  Final total minted: 3100
+  Final user2 balance: 3000
+
+[PASS] test_PlatformFeeAccumulation() (gas: 351721)
+Logs:
+  Factory deployed at: 0x88F59F8826af5e695B13cA934d6c7999875A9EeA
+  Token implementation at: 0xf801f3A6F4e09F82D6008505C67a0A5b39842406
+  Platform fee rate: 5
+  Using real Uniswap addresses:
+    Router: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+    Factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    WETH: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Platform fee accumulation test passed
+  Accumulated platform fee: 50000000000000000
+
+Suite result: ok. 17 passed; 0 failed; 0 skipped; finished in 9.37ms (31.85ms CPU time)
+
+Ran 1 test suite in 13.32ms (9.37ms CPU time): 17 tests passed, 0 failed, 0 skipped (17 total tests)
