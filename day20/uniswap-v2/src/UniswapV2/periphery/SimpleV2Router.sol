@@ -5,7 +5,14 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../core/SimpleV2Factory.sol";
 import "../core/SimpleV2Pair.sol";
+import "../core/WETH.sol";
 import "../libraries/SimpleMath.sol";
+
+interface IWETH {
+    function deposit() external payable;
+    function withdraw(uint256 wad) external;
+    function transfer(address to, uint256 value) external returns (bool);
+}
 
 /**
  * @title SimpleV2Router
@@ -16,14 +23,16 @@ contract SimpleV2Router {
     using SimpleMath for uint256;
 
     address public immutable factory;
+    address public immutable WETH;
 
     modifier ensure(uint256 deadline) {
         require(deadline >= block.timestamp, "SimpleV2Router: EXPIRED");
         _;
     }
 
-    constructor(address _factory) {
+    constructor(address _factory, address _WETH) {
         factory = _factory;
+        WETH = _WETH;
     }
 
     /**
@@ -148,7 +157,7 @@ contract SimpleV2Router {
      * @dev 移除流动性
      */
     function removeLiquidity(address tokenA, address tokenB, uint256 liquidity, uint256 amountAMin, uint256 amountBMin, address to, uint256 deadline)
-        external ensure(deadline) returns (uint256 amountA, uint256 amountB) {
+        public ensure(deadline) returns (uint256 amountA, uint256 amountB) {
         address pair = SimpleV2Factory(factory).getPair(tokenA, tokenB);
         require(pair != address(0), "SimpleV2Router: PAIR_NOT_EXISTS");
         
@@ -268,5 +277,185 @@ contract SimpleV2Router {
                 }
             }
         }
+    }
+
+    // ================= ETH相关函数 =================
+
+    /**
+     * @dev 添加ETH流动性
+     * @param token 代币地址
+     * @param amountTokenDesired 期望添加的代币数量
+     * @param amountTokenMin 最小接受的代币数量
+     * @param amountETHMin 最小接受的ETH数量
+     * @param to 接收流动性代币的地址
+     * @param deadline 交易截止时间
+     * @return amountToken 实际添加的代币数量
+     * @return amountETH 实际添加的ETH数量
+     * @return liquidity 铸造的流动性代币数量
+     */
+    function addLiquidityETH(address token, uint256 amountTokenDesired, uint256 amountTokenMin, uint256 amountETHMin, address to, uint256 deadline)
+        external payable ensure(deadline) returns (uint256 amountToken, uint256 amountETH, uint256 liquidity) {
+        (amountToken, amountETH) = _addLiquidity(
+            token,
+            WETH,
+            amountTokenDesired,
+            msg.value,
+            amountTokenMin,
+            amountETHMin
+        );
+        address pair = SimpleV2Factory(factory).getPair(token, WETH);
+        if (pair == address(0)) {
+            pair = SimpleV2Factory(factory).createPair(token, WETH);
+        }
+        IERC20(token).safeTransferFrom(msg.sender, pair, amountToken);
+        IWETH(WETH).deposit{value: amountETH}();
+        assert(IWETH(WETH).transfer(pair, amountETH));
+        liquidity = SimpleV2Pair(pair).mint(to);
+        // 退还多余的ETH
+        if (msg.value > amountETH) payable(msg.sender).transfer(msg.value - amountETH);
+    }
+
+    /**
+     * @dev 移除ETH流动性
+     * @param token 代币地址
+     * @param liquidity 要移除的流动性数量
+     * @param amountTokenMin 最小接受的代币数量
+     * @param amountETHMin 最小接受的ETH数量
+     * @param to 接收代币的地址
+     * @param deadline 交易截止时间
+     * @return amountToken 返回的代币数量
+     * @return amountETH 返回的ETH数量
+     */
+    function removeLiquidityETH(address token, uint256 liquidity, uint256 amountTokenMin, uint256 amountETHMin, address to, uint256 deadline)
+        external ensure(deadline) returns (uint256 amountToken, uint256 amountETH) {
+        (amountToken, amountETH) = removeLiquidity(
+            token,
+            WETH,
+            liquidity,
+            amountTokenMin,
+            amountETHMin,
+            address(this),
+            deadline
+        );
+        IERC20(token).safeTransfer(to, amountToken);
+        IWETH(WETH).withdraw(amountETH);
+        payable(to).transfer(amountETH);
+    }
+
+    /**
+     * @dev 使用精确ETH交换代币
+     * @param amountOutMin 期望获得的最小代币数量
+     * @param path 交易路径，必须以WETH开始
+     * @param to 接收代币的地址
+     * @param deadline 交易截止时间
+     * @return amounts 交易路径上每一步的代币数量数组
+     */
+    function swapExactETHForTokens(uint256 amountOutMin, address[] calldata path, address to, uint256 deadline)
+        external payable ensure(deadline) returns (uint256[] memory amounts) {
+        require(path[0] == WETH, "SimpleV2Router: INVALID_PATH");
+        amounts = getAmountsOut(msg.value, path);
+        require(amounts[amounts.length - 1] >= amountOutMin, "SimpleV2Router: INSUFFICIENT_OUTPUT_AMOUNT");
+        IWETH(WETH).deposit{value: amounts[0]}();
+        assert(IWETH(WETH).transfer(SimpleV2Factory(factory).getPair(path[0], path[1]), amounts[0]));
+        _swap(amounts, path, to);
+    }
+
+    /**
+     * @dev 使用代币交换精确ETH
+     * @param amountOut 期望获得的确切ETH数量
+     * @param amountInMax 愿意支付的最大代币数量
+     * @param path 交易路径，必须以WETH结束
+     * @param to 接收ETH的地址
+     * @param deadline 交易截止时间
+     * @return amounts 交易路径上每一步的代币数量数组
+     */
+    function swapTokensForExactETH(uint256 amountOut, uint256 amountInMax, address[] calldata path, address to, uint256 deadline)
+        external ensure(deadline) returns (uint256[] memory amounts) {
+        require(path[path.length - 1] == WETH, "SimpleV2Router: INVALID_PATH");
+        amounts = getAmountsIn(amountOut, path);
+        require(amounts[0] <= amountInMax, "SimpleV2Router: EXCESSIVE_INPUT_AMOUNT");
+        IERC20(path[0]).safeTransferFrom(
+            msg.sender, SimpleV2Factory(factory).getPair(path[0], path[1]), amounts[0]
+        );
+        _swap(amounts, path, address(this));
+        IWETH(WETH).withdraw(amounts[amounts.length - 1]);
+        payable(to).transfer(amounts[amounts.length - 1]);
+    }
+
+    /**
+     * @dev 使用精确代币交换ETH
+     * @param amountIn 输入代币的确切数量
+     * @param amountOutMin 期望获得的最小ETH数量
+     * @param path 交易路径，必须以WETH结束
+     * @param to 接收ETH的地址
+     * @param deadline 交易截止时间
+     * @return amounts 交易路径上每一步的代币数量数组
+     */
+    function swapExactTokensForETH(uint256 amountIn, uint256 amountOutMin, address[] calldata path, address to, uint256 deadline)
+        external ensure(deadline) returns (uint256[] memory amounts) {
+        require(path[path.length - 1] == WETH, "SimpleV2Router: INVALID_PATH");
+        amounts = getAmountsOut(amountIn, path);
+        require(amounts[amounts.length - 1] >= amountOutMin, "SimpleV2Router: INSUFFICIENT_OUTPUT_AMOUNT");
+        IERC20(path[0]).safeTransferFrom(
+            msg.sender, SimpleV2Factory(factory).getPair(path[0], path[1]), amounts[0]
+        );
+        _swap(amounts, path, address(this));
+        IWETH(WETH).withdraw(amounts[amounts.length - 1]);
+        payable(to).transfer(amounts[amounts.length - 1]);
+    }
+
+    /**
+     * @dev 使用ETH交换精确代币
+     * @param amountOut 期望获得的确切代币数量
+     * @param path 交易路径，必须以WETH开始
+     * @param to 接收代币的地址
+     * @param deadline 交易截止时间
+     * @return amounts 交易路径上每一步的代币数量数组
+     */
+    function swapETHForExactTokens(uint256 amountOut, address[] calldata path, address to, uint256 deadline)
+        external payable ensure(deadline) returns (uint256[] memory amounts) {
+        require(path[0] == WETH, "SimpleV2Router: INVALID_PATH");
+        amounts = getAmountsIn(amountOut, path);
+        require(amounts[0] <= msg.value, "SimpleV2Router: EXCESSIVE_INPUT_AMOUNT");
+        IWETH(WETH).deposit{value: amounts[0]}();
+        assert(IWETH(WETH).transfer(SimpleV2Factory(factory).getPair(path[0], path[1]), amounts[0]));
+        _swap(amounts, path, to);
+        // 退还多余的ETH
+        if (msg.value > amounts[0]) payable(msg.sender).transfer(msg.value - amounts[0]);
+    }
+
+    /**
+     * @dev 内部函数：添加流动性计算（支持ETH）
+     */
+    function _addLiquidity(address tokenA, address tokenB, uint256 amountADesired, uint256 amountBDesired, uint256 amountAMin, uint256 amountBMin)
+        internal view returns (uint256 amountA, uint256 amountB) {
+        // 创建交易对（如果不存在）
+        address pair = SimpleV2Factory(factory).getPair(tokenA, tokenB);
+        if (pair == address(0)) {
+            (amountA, amountB) = (amountADesired, amountBDesired);
+        } else {
+            (uint256 reserveA, uint256 reserveB) = getReserves(tokenA, tokenB);
+            if (reserveA == 0 && reserveB == 0) {
+                (amountA, amountB) = (amountADesired, amountBDesired);
+            } else {
+                uint256 amountBOptimal = (amountADesired * reserveB) / reserveA;
+                if (amountBOptimal <= amountBDesired) {
+                    require(amountBOptimal >= amountBMin, "SimpleV2Router: INSUFFICIENT_B_AMOUNT");
+                    (amountA, amountB) = (amountADesired, amountBOptimal);
+                } else {
+                    uint256 amountAOptimal = (amountBDesired * reserveA) / reserveB;
+                    assert(amountAOptimal <= amountADesired);
+                    require(amountAOptimal >= amountAMin, "SimpleV2Router: INSUFFICIENT_A_AMOUNT");
+                    (amountA, amountB) = (amountAOptimal, amountBDesired);
+                }
+            }
+        }
+    }
+
+    /**
+     * @dev 接收ETH
+     */
+    receive() external payable {
+        assert(msg.sender == WETH); // 只接受来自WETH合约的ETH
     }
 } 
