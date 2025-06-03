@@ -18,13 +18,13 @@ async function main() {
         throw new Error('请设置 PRIVATE_KEY 环境变量');
     }
 
-    const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+    const provider = new ethers.providers.JsonRpcProvider(SEPOLIA_RPC_URL);
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     
     console.log('📍 钱包地址:', wallet.address);
     
     const balance = await provider.getBalance(wallet.address);
-    console.log('💰 账户余额:', ethers.formatEther(balance), 'ETH');
+    console.log('💰 账户余额:', ethers.utils.formatEther(balance), 'ETH');
 
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, wallet);
     
@@ -43,7 +43,8 @@ async function main() {
     const flashbotsProvider = await FlashbotsBundleProvider.create(
         provider,
         authSigner,
-        FLASHBOTS_URL
+        FLASHBOTS_URL,
+        'sepolia'  // 添加链标识符
     );
 
     const currentBlock = await provider.getBlockNumber();
@@ -55,19 +56,19 @@ async function main() {
     const feeData = await provider.getFeeData();
     
     // 从当前网络获取费用数据，并提高2倍
-    const networkMaxPriorityFeePerGas = feeData.maxPriorityFeePerGas || ethers.parseUnits('2', 'gwei');
-    const networkMaxFeePerGas = feeData.maxFeePerGas || ethers.parseUnits('20', 'gwei');
+    const networkMaxPriorityFeePerGas = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('2', 'gwei');
+    const networkMaxFeePerGas = feeData.maxFeePerGas || ethers.utils.parseUnits('20', 'gwei');
     
-    // 在网络费用基础上提高2倍
-    const maxPriorityFeePerGas = networkMaxPriorityFeePerGas * 2n;
-    const maxFeePerGas = networkMaxFeePerGas * 2n;
+    // 在网络费用基础上提高2倍  
+    const maxPriorityFeePerGas = networkMaxPriorityFeePerGas.mul(2);
+    const maxFeePerGas = networkMaxFeePerGas.mul(2);
     
     console.log('⛽ 网络 Gas 费用:');
-    console.log('  - 网络 maxPriorityFeePerGas:', ethers.formatUnits(networkMaxPriorityFeePerGas, 'gwei'), 'gwei');
-    console.log('  - 网络 maxFeePerGas:', ethers.formatUnits(networkMaxFeePerGas, 'gwei'), 'gwei');
+    console.log('  - 网络 maxPriorityFeePerGas:', ethers.utils.formatUnits(networkMaxPriorityFeePerGas, 'gwei'), 'gwei');
+    console.log('  - 网络 maxFeePerGas:', ethers.utils.formatUnits(networkMaxFeePerGas, 'gwei'), 'gwei');
     console.log('⛽ 使用的 Gas 费用 (2倍提升):');
-    console.log('  - maxPriorityFeePerGas:', ethers.formatUnits(maxPriorityFeePerGas, 'gwei'), 'gwei');
-    console.log('  - maxFeePerGas:', ethers.formatUnits(maxFeePerGas, 'gwei'), 'gwei');
+    console.log('  - maxPriorityFeePerGas:', ethers.utils.formatUnits(maxPriorityFeePerGas, 'gwei'), 'gwei');
+    console.log('  - maxFeePerGas:', ethers.utils.formatUnits(maxFeePerGas, 'gwei'), 'gwei');
 
     let nonce = await provider.getTransactionCount(wallet.address, 'pending');
     
@@ -78,20 +79,23 @@ async function main() {
             data: contract.interface.encodeFunctionData('enablePresale'),
             maxFeePerGas,
             maxPriorityFeePerGas,
-            gasLimit: 100000n,
+            gasLimit: 100000,
             nonce: nonce++,
             type: 2,
             chainId: SEPOLIA_CHAIN_ID
         };
         
-        const signedEnablePresaleTx = await wallet.signTransaction(enablePresaleTx);
-        transactions.push({ signedTransaction: signedEnablePresaleTx });
+        // 使用 {signer, transaction} 格式
+        transactions.push({
+            signer: wallet,
+            transaction: enablePresaleTx
+        });
         console.log('✅ 已准备 enablePresale 交易');
     }
 
     // 添加 presale 交易
     const presaleAmount = 1;
-    const presaleValue = ethers.parseEther('0.01');
+    const presaleValue = ethers.utils.parseEther('0.01');
     
     const presaleTx = {
         to: CONTRACT_ADDRESS,
@@ -99,14 +103,17 @@ async function main() {
         value: presaleValue,
         maxFeePerGas,
         maxPriorityFeePerGas,
-        gasLimit: 200000n,
+        gasLimit: 200000,
         nonce,
         type: 2,
         chainId: SEPOLIA_CHAIN_ID
     };
     
-    const signedPresaleTx = await wallet.signTransaction(presaleTx);
-    transactions.push({ signedTransaction: signedPresaleTx });
+    // 使用 {signer, transaction} 格式
+    transactions.push({
+        signer: wallet,
+        transaction: presaleTx
+    });
     
     console.log('✅ 已准备 presale 交易');
     console.log('📦 准备发送', transactions.length, '个交易');
@@ -114,32 +121,58 @@ async function main() {
     // 模拟交易
     console.log('🧪 尝试模拟交易执行...');
     try {
-        const signedTransactions = transactions.map(tx => tx.signedTransaction);
+        // 先签名 Bundle 然后模拟
+        const signedTransactions = await flashbotsProvider.signBundle(transactions);
         const simulation = await flashbotsProvider.simulate(
             signedTransactions,
             targetBlockNumber,
             targetBlockNumber - 1
         );
         
-        console.log('✅ 模拟成功！');
-        console.log('📊 模拟结果:');
-        console.log('  - 总 Gas 使用:', simulation.totalGasUsed);
-        console.log('  - Coinbase 差额:', simulation.coinbaseDiff ? ethers.formatEther(simulation.coinbaseDiff) + ' ETH' : 'N/A');
-        
-        // 检查每个交易的模拟结果
-        if (simulation.results && Array.isArray(simulation.results)) {
-            simulation.results.forEach((result, index) => {
-                console.log(`  - 交易 ${index + 1}:`, {
-                    gasUsed: result.gasUsed,
-                    gasPrice: result.gasPrice ? ethers.formatUnits(result.gasPrice, 'gwei') + ' gwei' : 'N/A',
-                    success: !result.error
-                });
-                if (result.error) {
-                    console.log(`    ❌ 错误: ${result.error}`);
-                }
-            });
+        // 检查模拟是否有错误
+        if (simulation.error) {
+            console.log('❌ 模拟失败:', simulation.error);
+            console.log('📤 跳过模拟检查，继续发送捆绑交易...');
         } else {
-            console.log('  - 交易结果: 详细信息不可用');
+            console.log('✅ 模拟成功！');
+            console.log('📊 模拟结果:');
+            
+            // 计算总 Gas 使用量
+            let totalGasUsed = ethers.BigNumber.from(0);
+            if (simulation.results && Array.isArray(simulation.results)) {
+                simulation.results.forEach(result => {
+                    if (result.gasUsed) {
+                        totalGasUsed = totalGasUsed.add(result.gasUsed);
+                    }
+                });
+            }
+            
+            console.log('  - 总 Gas 使用:', totalGasUsed.gt(0) ? totalGasUsed.toString() : (simulation.totalGasUsed || 'N/A'));
+            console.log('  - Coinbase 差额:', simulation.coinbaseDiff ? ethers.utils.formatEther(simulation.coinbaseDiff) + ' ETH' : 'N/A');
+            
+            // 检查每个交易的模拟结果
+            if (simulation.results && Array.isArray(simulation.results)) {
+                simulation.results.forEach((result, index) => {
+                    console.log(`  - 交易 ${index + 1}:`, {
+                        gasUsed: result.gasUsed ? result.gasUsed.toString() : 'N/A',
+                        gasPrice: result.gasPrice ? ethers.utils.formatUnits(result.gasPrice, 'gwei') + ' gwei' : 'N/A',
+                        success: !result.error,
+                        error: result.error || null
+                    });
+                    if (result.error) {
+                        console.log(`    ❌ 错误: ${result.error}`);
+                    }
+                });
+            } else {
+                console.log('  - 交易结果: 详细信息不可用');
+            }
+        }
+        
+        // 调试：显示完整的模拟结果结构
+        console.log('🔍 调试信息 - 模拟结果结构:');
+        console.log('  - 可用字段:', Object.keys(simulation));
+        if (simulation.error) {
+            console.log('  - 错误详情:', simulation.error);
         }
     } catch (error) {
         console.warn('⚠️  模拟失败:', error.message);
@@ -147,7 +180,15 @@ async function main() {
     }
 
     // 发送捆绑交易
-    const bundleResponse = await flashbotsProvider.sendBundle(transactions, targetBlockNumber);
+    const bundleResponse = await flashbotsProvider.sendBundle(
+        transactions, 
+        targetBlockNumber,
+        {
+            // 可选：设置最小和最大时间戳
+            minTimestamp: Math.floor(Date.now() / 1000),
+            maxTimestamp: Math.floor(Date.now() / 1000) + 300  // 5分钟内有效
+        }
+    );
     console.log('📤 Bundle Hash:', bundleResponse.bundleHash);
 
     // 等待目标区块
@@ -187,19 +228,52 @@ async function main() {
 
     // 检查交易状态
     console.log('🔍 检查交易哈希状态...');
-    for (let i = 0; i < transactions.length; i++) {
-        const tx = ethers.Transaction.from(transactions[i].signedTransaction);
-        console.log(`📋 交易 ${i + 1} 哈希:`, tx.hash);
+    try {
+        // 使用等待方法检查bundle状态
+        const resolution = await bundleResponse.wait();
+        console.log('📋 Bundle 等待结果:', resolution);
         
-        const receipt = await provider.getTransactionReceipt(tx.hash);
-        if (receipt) {
-            console.log(`✅ 交易 ${i + 1} 已确认:`, {
-                blockNumber: receipt.blockNumber,
-                gasUsed: receipt.gasUsed.toString(),
-                status: receipt.status === 1 ? 'SUCCESS' : 'FAILED'
+        // 尝试获取收据
+        const receipts = await bundleResponse.receipts();
+        if (receipts && receipts.length > 0) {
+            receipts.forEach((receipt, index) => {
+                if (receipt) {
+                    console.log(`✅ 交易 ${index + 1} 已确认:`, {
+                        txHash: receipt.transactionHash,
+                        blockNumber: receipt.blockNumber,
+                        gasUsed: receipt.gasUsed.toString(),
+                        status: receipt.status === 1 ? 'SUCCESS' : 'FAILED'
+                    });
+                } else {
+                    console.log(`❌ 交易 ${index + 1} 未找到收据`);
+                }
             });
         } else {
-            console.log(`❌ 交易 ${i + 1} 未找到收据`);
+            console.log('❌ 无法获取交易收据');
+        }
+    } catch (error) {
+        console.log('⚠️  检查交易状态失败:', error.message);
+        
+        // 备用方法：直接从签名交易获取哈希
+        try {
+            const signedTransactions = await flashbotsProvider.signBundle(transactions);
+            for (let i = 0; i < signedTransactions.length; i++) {
+                const tx = ethers.Transaction.from(signedTransactions[i]);
+                console.log(`📋 交易 ${i + 1} 哈希:`, tx.hash);
+                
+                const receipt = await provider.getTransactionReceipt(tx.hash);
+                if (receipt) {
+                    console.log(`✅ 交易 ${i + 1} 已确认:`, {
+                        blockNumber: receipt.blockNumber,
+                        gasUsed: receipt.gasUsed.toString(),
+                        status: receipt.status === 1 ? 'SUCCESS' : 'FAILED'
+                    });
+                } else {
+                    console.log(`❌ 交易 ${i + 1} 未找到收据`);
+                }
+            }
+        } catch (backupError) {
+            console.log('⚠️  备用方法也失败:', backupError.message);
         }
     }
 
