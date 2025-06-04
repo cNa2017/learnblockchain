@@ -1,0 +1,40 @@
+type Bought @entity(immutable: true) {
+  id: Bytes!
+  tokenId: BigInt! # uint256
+  buyer: Bytes! # address
+  price: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Listed @entity(immutable: true) {
+  id: Bytes!
+  tokenId: BigInt! # uint256
+  seller: Bytes! # address
+  price: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TokensReceived @entity(immutable: true) {
+  id: Bytes!
+  tokenId: BigInt! # uint256
+  buyer: Bytes! # address
+  price: BigInt! # uint256
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type WhitelistPurchase @entity(immutable: true) {
+  id: Bytes!
+  tokenId: BigInt! # uint256
+  buyer: Bytes! # address
+  price: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
