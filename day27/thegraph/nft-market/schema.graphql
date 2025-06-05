@@ -6,6 +6,7 @@ type Bought @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  list: Listed!
 }
 
 type Listed @entity(immutable: true) {
